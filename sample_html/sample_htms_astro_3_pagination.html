@@ -1,0 +1,19 @@
+<!-- <request-list
+  start="1"
+  pagination-xpath="//div[@class='nav-links']/a[last()-1]/text()"
+  url-template="f'https://www.astronomy.com/tags/news/page/{i}/'"
+  parser="main-news"
+></request-list> -->
+<request-list
+  start="1"
+  end="12"
+  url-template="f'https://www.astronomy.com/tags/news/page/{i}/'"
+  parser="main-news"
+></request-list>
+<list name="main-news" xpath="//main/div/article" key="url">
+  <item name="url" xpath=".//a/@href"></item>
+  <item name="image_url" xpath=".//a/img/@src"></item>
+  <item name="title" xpath="./header/h2/a/text()"></item>
+</list>
+
+<output path="astronomy_news.json" type="json" parser="main-news"></output>
