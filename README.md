@@ -66,7 +66,7 @@ First, create an HTML file with the following content:
 Next, run this command in the folder in which you cloned ths repo:
 
 ```
-python -m htms.start <your-html-file>
+python -m htms <your-html-file>
 ```
 
 Alternatively, you can use call the Python API to execute the scraping:
@@ -89,7 +89,7 @@ You can see a list of sample HTML configuration files under `sample_html` folder
 To run these examples, use this command:
 
 ```
-python -m htms.start sample_html/<html-file-name>.html
+python -m htms sample_html/<html-file-name>.html
 ```
 
 ### Handling Pagination
