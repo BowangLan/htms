@@ -2,13 +2,17 @@ import sys
 import os
 from pathlib import Path
 from rich import print
+import importlib.resources
 
 from htms.HTMSLParser import HTMSParser
+from htms.constants import PACKAGE_NAME
+
+example_html_path = Path(importlib.resources.files(PACKAGE_NAME)) / "example_html"
 
 
 def get_example_files():
     examples = []
-    for file in os.listdir(Path(__file__).parent / "../../../example_html"):
+    for file in os.listdir(Path(example_html_path)):
         if file.endswith(".html"):
             examples.append(file)
     return examples
@@ -30,7 +34,7 @@ def main():
         print(f"File '{file_name}' not found in example_html")
         return
 
-    file_path = Path(__file__).parent / "../../../example_html" / file_name
+    file_path = Path(example_html_path) / file_name
     with open(file_path, "r") as f:
         sample_html = f.read()
         print(f"Loaded html from '{file_name}'")
