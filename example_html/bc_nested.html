@@ -1,0 +1,28 @@
+<request url="https://badmintonclubs.org">
+  <list
+    xpath="//map/area"
+    name="locations"
+    key="href"
+    follow-up-parsers="location-page-parser"
+    follow-up-url="'https://badmintonclubs.org' + value['href']"
+    follow-up-concat="location-page-parser"
+    parse="value[:5]"
+  >
+    <item
+      name="name"
+      xpath="@title"
+      parse="value.split('badminton in ')[1] if value else None"
+    ></item>
+    <item name="href" xpath="@href"></item>
+  </list>
+</request>
+
+<list id="location-page-parser" name="clubs" xpath="//table//tr/td/a">
+  <item name="name" xpath="text()"></item>
+  <item name="location" xpath="../../td[2]/text()" strip></item>
+  <item name="href" xpath="@href"></item>
+  <item name="phone" xpath="../../td[3]/text()"></item>
+  <!-- <item name="state" parse="request.meta['name']"></item> -->
+</list>
+
+<!-- <output path="./clubs.json" type="json" parser="location-page-parser"></output> -->

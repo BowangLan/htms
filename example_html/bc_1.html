@@ -1,0 +1,10 @@
+<request url="https://badmintonclubs.org" parsers="locations"></request>
+<list xpath="//div[@class='states']/ul/li/a" id="locations" name="locations" global>
+  <!-- <item
+    name="name"
+    xpath="text()"
+    parse="lambda value: value.split('badminton in ')[1] if value else None"
+  ></item> -->
+  <item name="href" xpath="@href"></item>
+  <item name="name" xpath="text()"></item>
+</list>

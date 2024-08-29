@@ -1,9 +1,0 @@
-<request url="https://badmintonclubs.org" parser="locations"></request>
-<list xpath="//map/area" name="locations" key="href">
-  <item
-    name="name"
-    xpath="@title"
-    parse="value.split('badminton in ')[1] if value else None"
-  ></item>
-  <item name="href" xpath="@href"></item>
-</list>

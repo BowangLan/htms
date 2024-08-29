@@ -1,0 +1,7 @@
+<request url="https://realpython.com/search/api/v1/?order=newest&continue_after=40" type="json">
+  <list name="items" get-items="v['results']">
+    <item name="title" parse="value['title']"/>
+    <item name="url" parse="value['url']"/>
+    <item name="description" parse="value['description']"/>
+  </list>
+</request>

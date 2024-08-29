@@ -1,0 +1,9 @@
+<request url="https://talkpython.fm/episodes/all">
+  <list name="episodes" xpath="//table/tbody/tr">
+    <item name="number" xpath="./td[1]/text()"></item>
+    <item name="date" xpath="./td[2]/text()"></item>
+    <item name="title" xpath="./td[3]/a/text()"></item>
+    <item name="url" xpath="./td[3]/a/@href"></item>
+    <item name="guests" xpath="./td[4]/text()"></item>
+  </list>
+</request>

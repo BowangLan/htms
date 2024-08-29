@@ -29,6 +29,20 @@ git clone https://github.com/yourusername/htms.git
 pip install HTMSparser
 ``` -->
 
+## Run Examples
+
+A list of example HTML files are included in this repo under `example_html` folder. To run these, use this command:
+
+```
+python -m htms.examples <example-file-name>
+```
+
+You can see a full list of example files using this command:
+
+```
+python -m htms.examples
+```
+
 ## Usage
 
 ### Basic Example

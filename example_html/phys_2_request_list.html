@@ -1,13 +1,12 @@
-<request
-  url="https://phys.org/space-news/astronomy/"
-  parser="main-news"
-></request>
-<request
-  url="https://phys.org/space-news/astronomy/page2.html"
-  parser="main-news"
-></request>
+<request-list
+  list="[i for i in range(1, 4)]"
+  get-url="lambda i: 'https://phys.org/space-news/astronomy/page' + str(i) + '.html'"
+  parsers="main-news-parser"
+  concat="main-news-parser"
+></request-list>
 <list
-  name="main-news"
+  id="main-news-parser"
+  name="articles"
   xpath="//article[@class='sorted-article']"
   key="url"
 >

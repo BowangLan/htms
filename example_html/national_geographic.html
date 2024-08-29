@@ -1,0 +1,14 @@
+<request url="https://www.nationalgeographic.com/">
+  <list xpath="//div[@class='HomepagePromos__promo']" name="articles">
+    <item name="title" xpath=".//a/span/text()"></item>
+    <item name="url" xpath=".//a/@href"></item>
+    <!-- <item name="image_url" xpath="./div/div/div/span/@style" parse="value.split('background-image: url')[1].strip('()')[1:-1]"></item> -->
+    <item name="image_url" xpath=".//span/@style"></item>
+    <list name="tags" xpath=".//ul/li/a">
+      <item name="name" xpath="./span/text()"></item>
+      <item name="url" xpath="@href"></item>
+    </list>
+  </list>
+
+  <export path="national_geographic.json" format="json"></export>
+</request>

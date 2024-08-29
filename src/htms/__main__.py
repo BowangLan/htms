@@ -1,8 +1,9 @@
 import sys
-from htms.HTMSParser import HTMSParser
+from htms.HTMSLParser import HTMSParser
 
 
-if __name__ == "__main__":
+def main():
+
     # get first parameter from command line
     if len(sys.argv) > 1:
         file_name = sys.argv[1]
@@ -18,3 +19,7 @@ if __name__ == "__main__":
     parser = HTMSParser()
     parser.feed(sample_html)
     parser.start()
+
+
+if __name__ == "__main__":
+    main()

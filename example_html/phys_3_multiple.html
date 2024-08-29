@@ -1,6 +1,6 @@
 <request
   url="https://phys.org/space-news/astronomy"
-  parser="main-news,nav-items"
+  parsers="main-news-parser,nav-items-parser"
 ></request>
 <!-- <request-list
   start="1"
@@ -10,6 +10,7 @@
 ></request-list> -->
 
 <list
+  id="nav-items-parser"
   name="nav-items"
   xpath="//nav/div[2]/div//a"
   filter="item['title'] != ''"
@@ -18,7 +19,7 @@
   <item name="title" xpath="text()" strip></item>
 </list>
 
-<list name="main-news" xpath="//article[@class='sorted-article']" key="url">
+<list id="main-news-parser" name="main-news" xpath="//article[@class='sorted-article']" key="url">
   <item name="url" xpath=".//a/@href"></item>
   <item name="title" xpath=".//h3/a/text()"></item>
   <item name="subtitle" xpath=".//p/text()" strip></item>

@@ -1,10 +1,13 @@
-<request-list
-  start="1"
-  end="5"
-  url-template="'https://phys.org/space-news/astronomy/page' + str(i) + '.html'"
-  parser="main-news"
-></request-list>
+<request
+  url="https://phys.org/space-news/astronomy/"
+  parsers="main-news"
+></request>
+<request
+  url="https://phys.org/space-news/astronomy/page2.html"
+  parsers="main-news"
+></request>
 <list
+  id="main-news"
   name="main-news"
   xpath="//article[@class='sorted-article']"
   key="url"
@@ -17,7 +20,7 @@
     name="view_count"
     xpath="./div[2]/div[4]/p/span/text()"
     strip
-    parse="int(value)"
+    parse="int(v)"
   ></item>
   <item name="category" xpath="./div[2]/div[1]//p/text()" strip></item>
 </list>

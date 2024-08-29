@@ -1,0 +1,29 @@
+<request url="https://www.bbc.com">
+  <list
+    id="get-news-articles"
+    name="news-articles"
+    xpath="//a"
+    key="href"
+    filter="item['href'].startswith('/news/articles/') and item['summary']"
+    global
+  >
+    <item name="href" xpath="@href"></item>
+    <item name="title" xpath=".//h2/text()"></item>
+    <item name="summary" xpath=".//p/text()"></item>
+  </list>
+</request>
+
+<request
+  url="https://www.bbc.com/news/articles/c3d90ke0ello"
+  parsers="get-tags"
+>
+</request>
+<list
+  id="get-tags"
+  name="article-tags"
+  xpath="//div[@data-component='tags']/div/div/a"
+  global
+>
+  <item name="name" xpath="text()"></item>
+  <item name="href" xpath="@href"></item>
+</list>
