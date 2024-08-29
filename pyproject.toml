@@ -5,8 +5,8 @@ description = "A Python web scraping library using HTML"
 authors = ["BowangLan <bwldev85@uw.edu>"]
 readme = "README.md"
 license = "MIT"
-homepage = "https://github/BowangLan/htms"
-repository = "https://github/BowangLan/htms"
+homepage = "https://github.com/BowangLan/htms"
+repository = "https://github.com/BowangLan/htms"
 keywords = ["web scraping", "HTML"]
 classifiers = [
   "Environment :: Console",
@@ -16,9 +16,6 @@ classifiers = [
   "Topic :: Text Processing :: Markup :: HTML",
   "Topic :: Software Development :: Libraries :: Application Frameworks",
   "Topic :: Software Development :: Libraries :: Python Modules",
-]
-include = [
-  "src/example_html/*.html"
 ]
 
 [tool.poetry.dependencies]
