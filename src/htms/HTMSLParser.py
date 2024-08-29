@@ -11,7 +11,6 @@ from htms.tags.ItemTag import ItemTag
 from htms.tags.ListTag import ListTag
 from htms.tags.RequestTag import RequestTag
 from htms.tags.ExportTag import ExportTag
-from htms.utils import parse_lambda, remove_dup
 from htms.logging import logger
 from htms.tags.constants import (
     ITEM_TAG,
@@ -100,13 +99,6 @@ class HTMSParser(HTMLParser):
 
         return res
 
-    def _process_request(self, req: RequestTag):
-        response = self._fetch_page(req.url, req.method, req.headers)
-
-        if response:
-            tree = html.fromstring(response.content)
-            self._parse_response(tree, req)
-
     def _fetch_page(
         self, url: str, method: str, headers: Dict[str, str]
     ) -> Optional[requests.Response]:
@@ -115,16 +107,8 @@ class HTMSParser(HTMLParser):
             response.raise_for_status()
             return response
         except requests.RequestException as e:
-            # logging.error(f"Request failed for {url}: {e}")
+            logger.error(f"Request failed for {url}: {e}")
             return None
-
-    def _start(self):
-        if len(self.requests) == 0:
-            return
-
-        while len(self.requests) > 0:
-            req = self.requests.pop(0)
-            self._process_request(req)
 
     def _fill_request_with_parser_objs(
         self, req: Union[RequestTag, RequestListTag]
@@ -160,7 +144,7 @@ class HTMSParser(HTMLParser):
         logger.info(f"[{method}] '{url}'")
 
         # Fetch the web page
-        response = requests.request(method, url, **request_params)
+        response = self._fetch_page(url, method, request_params["headers"])
 
         # with open("output.html", "w", encoding="utf-8") as f:
         #     f.write(response.text)
@@ -313,26 +297,7 @@ class HTMSParser(HTMLParser):
 
         self.output.append(output)
 
-        # for p in self.global_parsers.values():
-        #     name = p.name or p.id
-        #     if name not in self.output:
-        #         self.output[name] = []
-        #     self.output[name] += p.value
-
         # print("Scraped Data:", self.output)
 
         # res_stats = {k: len(v) for k, v in self.output.items()}
         # print("Scraped Data Stats:", res_stats)
-
-        # output the data
-        # for output in self.exports:
-        #     if output.get("type") == "json":
-        #         parser_name = output["parser"]
-        #         if parser_name not in res:
-        #             print(f"Invalid parser name from output config: {parser_name}")
-        #             continue
-        #         data = res[parser_name]
-        #         path = output["path"]
-        #         with open(path, "w", encoding="utf-8") as f:
-        #             json.dump(data, f)
-        #             print(f"Saved {len(data)} items to '{path}'")
