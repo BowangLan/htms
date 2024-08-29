@@ -8,7 +8,6 @@ from .constants import (
     CSV_EXPORT_FORMAT,
     EXCEL_EXPORT_FORMAT,
 )
-import pandas as pd
 from htms.logging import logger
 import json
 

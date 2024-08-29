@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "htms"
+version = "0.1.0"
+description = "A Python web scraping library using HTML"
+authors = ["BowangLan <blan2@uw.edu>"]
+readme = "README.md"
+license = "MIT"
+homepage = "https://github/"
+keywords = ["web scraping", "HTML"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.32.3"
+lxml = "^5.3.0"
+
+[tool.poetry.group.dev.dependencies]
+rich = "^13.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
