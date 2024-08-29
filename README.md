@@ -2,7 +2,7 @@
 
 ## Overview
 
-HTMSLParser is a Python library for web scraping using an HTML-like configuration. It simplifies data extraction, handles pagination, and supports custom parsing, making it easy to gather structured data from websites with minimal coding.
+HTMS is a Python library for web scraping using an HTML-like configuration. It simplifies data extraction, handles pagination, and supports custom parsing, making it easy to gather structured data from websites with minimal coding.
 
 ## Features
 
@@ -33,7 +33,7 @@ git clone https://github.com/BowangLan/htms.git
 
 ## Getting Started
 
-htms lets you specify common web scraping tasks in HTML. To run an htms HTML file therefore is to run web scraping tasks described inside the HTML file.
+HTMS lets you specify common web scraping tasks in HTML. To run an htms HTML file therefore is to run web scraping tasks described inside the HTML file.
 
 Command for running an htms HTML file:
 

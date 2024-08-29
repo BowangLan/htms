@@ -17,6 +17,7 @@ class RequestTagBase:
     parser_names: List[str]
     method: str = "GET"
     headers: Optional[Dict[str, str]] = field(default_factory=dict)
+    cookies: Optional[str] = None
     meta: Optional[Dict[str, Any]] = field(default_factory=dict)
 
     response_type: Optional[str] = HTML_RESPONSE_TYPE
@@ -41,6 +42,7 @@ class RequestTag(TagBase, RequestTagBase):
             method=data.get("method", "GET"),
             headers=data.get("headers", {}),
             response_type=data.get("type", HTML_RESPONSE_TYPE),
+            cookies=data.get("cookies"),
         )
 
     def __str__(self) -> str:

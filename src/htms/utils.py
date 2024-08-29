@@ -1,3 +1,7 @@
+import http
+import requests
+
+
 def remove_dup(items: list[dict], key: str):
     keys = set()
     output = []
@@ -22,3 +26,13 @@ def parse_lambda(lambda_str: str, value: any, default_str: str):
     except Exception as e:
         print(f"Failed to parse with error: {e}")
         return default_str
+
+
+def make_cookie_jar_from_str(cookie_str: str):
+    cookie_jar = http.cookiejar.CookieJar()
+    cookies = cookie_str.split("; ")
+    for cookie in cookies:
+        name, value = cookie.split("=", 1)
+        cookie = requests.cookies.create_cookie(name=name, value=value)
+        cookie_jar.set_cookie(cookie)
+    return cookie_jar

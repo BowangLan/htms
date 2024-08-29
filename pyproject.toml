@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "htms"
-version = "0.1.9"
+version = "0.1.10"
 description = "A Python web scraping library using HTML"
-authors = ["BowangLan <bwldev85@uw.edu>"]
+authors = ["Jeffrey Lan <bwldev85@uw.edu>"]
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/BowangLan/htms"

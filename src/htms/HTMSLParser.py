@@ -11,6 +11,8 @@ from htms.tags.ItemTag import ItemTag
 from htms.tags.ListTag import ListTag
 from htms.tags.RequestTag import RequestTag
 from htms.tags.ExportTag import ExportTag
+from htms.tags.HeaderTag import HeaderTag
+from htms.tags.VariableTag import VariableTag
 from htms.logging import logger
 from htms.tags.constants import (
     ITEM_TAG,
@@ -19,7 +21,12 @@ from htms.tags.constants import (
     REQUEST_TAG,
     HTML_RESPONSE_TYPE,
     JSON_RESPONSE_TYPE,
+    EXPORT_TAG,
+    HEADER_TAG,
+    VARIABLE_TAG,
 )
+from htms.TemplateEngine import TemplateEngine
+from htms.utils import make_cookie_jar_from_str
 
 """
 Notes
@@ -41,8 +48,10 @@ TagMap = {
     REQUEST_TAG: RequestTag,
     LIST_TAG: ListTag,
     ITEM_TAG: ItemTag,
-    "export": ExportTag,
+    EXPORT_TAG: ExportTag,
     REQUEST_LIST_TAG: RequestListTag,
+    HEADER_TAG: HeaderTag,
+    VARIABLE_TAG: VariableTag,
 }
 
 
@@ -53,8 +62,9 @@ class HTMSParser(HTMLParser):
         self.request_generators: List[RequestListTag] = []
         self.global_parsers: Dict[str, ItemTag] = {}
         self.exports = []
-        self.items: List[ItemTag] = []
         self.parents: List[ItemTag] = []
+        self.variables: Dict[str, str] = {}
+        self.template_engine = TemplateEngine()
 
     def handle_starttag(self, tag: str, attrs: List[tuple]):
         attrs_dict = dict(attrs)
@@ -83,12 +93,24 @@ class HTMSParser(HTMLParser):
                 raise ValueError("Global item must have an id")
             self.global_parsers[tag_ins.id] = tag_ins
 
-        if isinstance(tag_ins, RequestListTag):
+        elif isinstance(tag_ins, RequestListTag):
             self.request_generators.append(tag_ins)
+
+        elif isinstance(tag_ins, VariableTag):
+            if tag_ins.name in self.template_engine.variables:
+                logger.error(f"Variable with name '{tag_ins.name}' already exists")
+            else:
+                self.template_engine.variables[tag_ins.name] = tag_ins.get_value()
+
+        else:
+            logger.error(f"Unknown tag: {tag}")
 
         self.parents.append(tag_ins)
 
     def handle_endtag(self, tag):
+        if tag not in TagMap:
+            return
+
         t = self.parents.pop()
 
     def handle_data(self, data):
@@ -100,10 +122,10 @@ class HTMSParser(HTMLParser):
         return res
 
     def _fetch_page(
-        self, url: str, method: str, headers: Dict[str, str]
+        self, url: str, method: str, **kwargs
     ) -> Optional[requests.Response]:
         try:
-            response = requests.request(method, url, headers=headers)
+            response = requests.request(method, url, **kwargs)
             response.raise_for_status()
             return response
         except requests.RequestException as e:
@@ -133,6 +155,7 @@ class HTMSParser(HTMLParser):
         logger.info(f"Starting request: {req}")
         url = req.url
         method = req.method
+
         request_params = {
             "headers": {**DEFAULT_HEADERS, **req.headers},
             # "params": req.get("params", {}),
@@ -140,11 +163,21 @@ class HTMSParser(HTMLParser):
             # "json": req.get("json", {}),
         }
 
+        if req.cookies:
+            req.cookies = self.template_engine.replace_variables(req.cookies)
+
+            try:
+                cookiejar = make_cookie_jar_from_str(req.cookies)
+                request_params["cookies"] = cookiejar
+            except Exception as e:
+                logger.error(f"Failed to parse cookies:", e)
+
+        
         logger.debug(f"Request: {req}")
         logger.info(f"[{method}] '{url}'")
 
         # Fetch the web page
-        response = self._fetch_page(url, method, request_params["headers"])
+        response = self._fetch_page(url, method, **request_params)
 
         # with open("output.html", "w", encoding="utf-8") as f:
         #     f.write(response.text)
@@ -184,8 +217,8 @@ class HTMSParser(HTMLParser):
                     f"Generated {len(follow_up_req_list._list)} follow-up requests"
                 )
 
-        output_stats = {k: len(v) for k, v in req_output.items()}
-        logger.info(f"Output stats: {output_stats}")
+        # output_stats = {k: len(v) for k, v in req_output.items()}
+        # logger.info(f"Output stats: {output_stats}")
         for k, v in req_output.items():
             print(f"{k}:")
             if isinstance(v, list):
@@ -222,8 +255,8 @@ class HTMSParser(HTMLParser):
                 else:
                     output[k].append(v)
 
-        output_stats = {k: len(v) for k, v in output.items()}
-        logger.info(f"Output stats: {output_stats}")
+        # output_stats = {k: len(v) for k, v in output.items()}
+        # logger.info(f"Output stats: {output_stats}")
 
         # print the first 5 items for each key
         for k, v in output.items():
@@ -297,7 +330,4 @@ class HTMSParser(HTMLParser):
 
         self.output.append(output)
 
-        # print("Scraped Data:", self.output)
-
-        # res_stats = {k: len(v) for k, v in self.output.items()}
-        # print("Scraped Data Stats:", res_stats)
+        return self.output

@@ -162,3 +162,5 @@ cython_debug/
 #.idea/
 
 *.json
+
+src/htms/example_html/*.hidden.html
