@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "htms"
-version = "0.1.6"
+version = "0.1.7"
 description = "A Python web scraping library using HTML"
 authors = ["BowangLan <bwldev85@uw.edu>"]
 readme = "README.md"
