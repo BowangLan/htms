@@ -6,6 +6,7 @@ from htms.tags.ExportTag import ExportTag
 from htms.tags.TagBase import TagBase
 from htms.tags.RequestTag import RequestTag
 from htms.tags.constants import REQUEST_LIST_TAG, JSON_RESPONSE_TYPE, HTML_RESPONSE_TYPE
+from htms.logging import logger
 
 
 @dataclass
@@ -54,20 +55,31 @@ class RequestListTag(TagBase, RequestListTagBase):
             headers=data.get("headers", {}),
             concat=concat,
             response_type=data.get("type", HTML_RESPONSE_TYPE),
-            meta=data.get("meta", {}),
+            meta=data.get("meta", []),
         )
 
     def generate_requests(self) -> List[RequestTag]:
         requests = []
-        for item in self._list:
+
+        metas = (
+            self.meta
+            if isinstance(self.meta, list)
+            else [self.meta for _ in self._list]
+        )
+        if len(metas) != len(self._list):
+            logger.error(
+                f"Request list meta length {len(metas)} != list length {len(self._list)}"
+            )
+            metas = [{} for _ in self._list]
+
+        for i, item in enumerate(self._list):
             url = eval(self.get_url, {}, locals())(item)
-            print(self.parser_names)
             r = RequestTag(
                 url=url,
                 parser_names=self.parser_names,
                 method=self.method,
                 headers=self.headers,
-                meta=self.meta,
+                meta=metas[i],
                 response_type=self.response_type,
                 children=self.children,
             )

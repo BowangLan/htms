@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "htms"
-version = "0.1.7"
+version = "0.1.9"
 description = "A Python web scraping library using HTML"
 authors = ["BowangLan <bwldev85@uw.edu>"]
 readme = "README.md"
@@ -22,6 +22,7 @@ classifiers = [
 python = "^3.11"
 requests = "^2.32.3"
 lxml = "^5.3.0"
+rich = "^13.8.0"
 
 [tool.poetry.group.dev.dependencies]
 rich = "^13.8.0"

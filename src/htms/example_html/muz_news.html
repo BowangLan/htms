@@ -1,0 +1,43 @@
+<request url="https://muz.li/blog">
+  <list
+    name="articles"
+    xpath="//*[@id='__nuxt']/div/main/div/div[2]/div/article"
+    follow-up-url="'https://muz.li' + value['url']"
+    follow-up-parsers="article-parser"
+    parse="value[:22]"
+  >
+    <item name="url" xpath="./a/@href"></item>
+    <item name="title" xpath=".//h2/text()"></item>
+    <item name="subtitle" xpath="./a/div/p[1]/text()" strip></item>
+    <list
+      name="categories"
+      xpath="./a/div/p[2]/span/text()"
+      pre-parse="value[0].split(',')"
+    >
+      <item name="name"></item>
+    </list>
+  </list>
+</request>
+
+<item
+  id="article-parser"
+  name="article"
+  parse="{**value['meta'], **value['new'], 'url': value['url']}"
+>
+  <item name="url" parse="request.url"></item>
+  <item name="meta" parse="request.meta"></item>
+  <item name="new">
+    <item
+      name="author"
+      xpath="//h1/../div/text()"
+      strip
+      parse="value.split('by')[1].split('on')[0].strip()"
+    ></item>
+    <item
+      name="date"
+      xpath="//h1/../div/text()"
+      strip
+      parse="value.split('by')[1].split('on')[1].strip()"
+    ></item>
+  </item>
+</item>

@@ -32,7 +32,9 @@ class ItemTag(TagBase):
     follow_up_parser_names: Optional[str] = None
     follow_up_concat: Optional[str] = None
 
-    _post_parse: str = "v"
+    default_value: Optional[str] = None
+
+    _post_parse: str = "value"
     strip: bool = False
 
     # the following fields are used for list operation
@@ -43,7 +45,7 @@ class ItemTag(TagBase):
     # list operation
     key: Optional[str] = None
     filter: Optional[str] = None
-    get_items: Optional[str] = None
+    pre_parse: Optional[str] = None
 
     value: Any = field(default=None, init=False)
 
@@ -53,16 +55,17 @@ class ItemTag(TagBase):
     @classmethod
     def from_attrs(cls, data: Dict[str, Any]) -> ItemTag:
         return cls(
+            many=data.get("many", False),
             id=data.get("id", None),
             name=data.get("name", None),
             xpath=data.get("xpath", None),
             _post_parse=data.get("parse", "value"),
+            pre_parse=data.get("pre-parse", "value"),
             strip="strip" in data,
-            many=data.get("many", False),
             key=data.get("key", None),
             filter=data.get("filter", None),
             is_global="global" in data,
-            get_items=data.get("get-items", "value"),
+            default_value=data.get("default", None),
             # follow up fields
             follow_up_url=data.get("follow-up-url", None),
             follow_up_parser_names=data.get("follow-up-parsers", "[]"),
@@ -78,14 +81,15 @@ class ItemTag(TagBase):
             value = value.xpath(self.xpath)
 
             if not self.many:
-                value = value[0] if value else None
+                value = value[0] if value else self.default_value
+
+        value = eval(self.pre_parse, {}, locals())
 
         if len(self.children) > 0:
             item_children = list(
                 filter(lambda x: isinstance(x, ItemTag), self.children)
             )
             if self.many:
-                value = eval(self.get_items, {}, locals())
                 value = [
                     {
                         item.name: item.parse(vi, request)

@@ -22,8 +22,8 @@ def main():
     example_files = get_example_files()
 
     if len(sys.argv) < 2:
-        print("Usage: htms <file.html>")
-        print("Examples:")
+        print("Usage: python -m htms.examples <file.html>")
+        print("List of all example files:")
         for example in get_example_files():
             print(f"  python -m htms.examples {example}")
         return
@@ -32,6 +32,9 @@ def main():
 
     if file_name not in example_files:
         print(f"File '{file_name}' not found in example_html")
+        print("List of all example files:")
+        for example in get_example_files():
+            print(f"  python -m htms.examples {example}")
         return
 
     file_path = Path(example_html_path) / file_name
