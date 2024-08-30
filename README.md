@@ -4,6 +4,9 @@
 
 HTMS is a Python library for web scraping using an HTML-like configuration. It simplifies data extraction, handles pagination, and supports custom parsing, making it easy to gather structured data from websites with minimal coding.
 
+- Currently only supports Xpath for data extraction from HTML response
+
+<!-- 
 ## Features
 
 - **Declarative Scraping Configuration:** Define scraping tasks using an HTML-like syntax to specify requests, lists, items, and outputs.
@@ -14,10 +17,9 @@ HTMS is a Python library for web scraping using an HTML-like configuration. It s
 - **Flexible Data Extraction:** Use XPath for precise data extraction, including support for custom parsing and filtering.
 - **JSON Output:** Export scraped data directly to JSON files.
 - **Item Data Manipulation:** Strip whitespace, parse data, and apply filters to extracted items.
-- **Request Configuration:** Supports GET and POST methods with customizable headers.
+- **Request Configuration:** Supports GET and POST methods with customizable headers. -->
 
 ## Installation
-
 
 You can install the package using `pip` if it is available on PyPI:
 
@@ -25,15 +27,17 @@ You can install the package using `pip` if it is available on PyPI:
 pip install htms
 ```
 
-Alternatively, to install htms, simply clone the repository and include it in your project:
+<!-- Alternatively, to install htms, simply clone the repository and include it in your project:
 
 ```bash
 git clone https://github.com/BowangLan/htms.git
-```
+``` -->
 
 ## Getting Started
 
-HTMS lets you specify common web scraping tasks in HTML. To run an htms HTML file therefore is to run web scraping tasks described inside the HTML file.
+### Run HTML Files
+
+HTMS lets you specify common web scraping tasks in HTML. **To run an htms HTML file therefore is to run web scraping tasks described inside the HTML file.**
 
 Command for running an htms HTML file:
 
@@ -51,15 +55,21 @@ with open('your-html-file.html', 'r') as file:
 
 parser = HTMSParser()
 parser.feed(html_str)
-parser.start()
+output = parser.start()
 ```
 
-## Run Examples
+### Run Examples
 
-A list of example HTML files are included in this repo under `src/htms/example_html` folder. To run these, use this command:
+A list of example HTML files are included in this repo under [`src/htms/example_html`](https://github.com/BowangLan/htms/tree/main/src/htms/example_html) folder. To run these example HTML files, use this command:
 
 ```
 python -m htms.examples <example-file-name>
+```
+
+For example:
+
+```
+python -m htms.examples bc_1.html
 ```
 
 You can see a full list of example files using this command:
@@ -68,28 +78,128 @@ You can see a full list of example files using this command:
 python -m htms.examples
 ```
 
-## HTML Configuration
+---
 
-### Basic Example
+### Basic Example & Tutorial
+
+To get started, let's srape all news articles from BBC's homepage. To do this, we'll need to create a `RequestTag` for specifying the URL and a `ListTag` for extracting the data.
+
+```html
+<request url="https://www.bbc.com">
+  <list name="news" xpath="//a/@href"></list>
+</request>
+```
+
+Save the above content in a file called `bbc_example.html` and run it:
+
+```
+python -m htms bbc_example.html
+```
+
+You should see something like this:
+
+```
+Loaded html from 'bbc_example.html'
+[16:55:26] INFO     Starting the scraping process                                                 HTMSLParser.py:249
+           INFO     While loop: 1 requests left                                                   HTMSLParser.py:254
+           INFO     Starting request: <RequestTag url='https://www.bbc.com' parser_names=[]       HTMSLParser.py:133
+                    parsers=['news'] >
+           INFO     [GET] 'https://www.bbc.com'                                                   HTMSLParser.py:144
+           INFO     Request output template: {'news': []}                                         HTMSLParser.py:171
+           INFO     Output stats: {'news': 199}                                                   HTMSLParser.py:188
+news:
+#main-content
+/
+/watch-live-news/
+... and 196 more
+```
+
+Let's export this data to a JSON file called `bbc-main-news.json` :
+
+```html
+<request url="https://www.bbc.com">
+  <list name="news" xpath="//a/@href"></list>
+  <export path="bbc-main-news.json" format="json" parser="news"></export>
+</request>
+```
+
+But we don't want all links in the HTML, just news article links. We can add a filter for that:
+
+```html
+<request url="https://www.bbc.com">
+  <list name="news" xpath="//a/@href" filter="item.startswith('/news/articles')"></list>
+  <export path="bbc-main-news.json" format="json" parser="news"></export>
+</request>
+```
+
+Note that `item.startswith('/news/articles')` is a Python expression that returns a boolean. This will be used as the filtering condition.
+
+`item` is provided for you to reference the current item among the extracted list of values when filtering.
+
+Now, we don't just want links. We'd like other information about the article, such as title, url, subtitle, etc. 
+
+To achieve this, we'll need to inspect the page to get the relative XPath for each of those field. 
+
+Once we know the XPath of each field, we can nest `ItemTag`s inside `ListTag` for extracting each field for each item extracted by the `ListTag` .
+
+```html
+<request url="https://www.bbc.com">
+  <list name="news" xpath="//a" filter="item['news-url'].startswith('/news/articles')">
+    <item name="title" xpath=".//h2/text()"></item>
+    <item name="news-url" xpath="./@href"></item>
+    <item name="subtitle" xpath=".//p/text()"></item>
+  </list>
+  <export path="bbc-main-news.json" format="json" parser="news"></export>
+</request>
+```
+
+Note that we changed `ListTag`'s XPath from `//a/@href` to `//a` because `//a/@href` returns a list of strings while `//a` returns a list of Element. These elements can then be passed to children `ItemTag`s for further processing and extraction.
+
+Now that we have children parser tags, inside the `filter` attribute, each item will be a object/dictionary like this: `{ "title": "...", "news-url": "..." }` . Therefore, we need to change the filtering expression to `item['news-url'].startswith('/news/articles')"` .
+
+And now we'll have something like this saved in our JSON file:
+
+```python
+[
+  {
+      'title': 'Israel agrees to pauses in fighting for polio vaccine drive',
+      'url': '/news/articles/cn02z5kjn40o',
+      'subtitle': 'It will be rolled out in three separate stages across the central, southern and northern parts of the
+  strip.'
+  }
+  {
+      'title': 'Harris defends policy shifts in high-stakes first interview',
+      'url': '/news/articles/c3ejw1kd7ndo',
+      'subtitle': '"My values have not changed," said Harris in a preview clip aired by CNN on Thursday afternoon.'
+  },
+  ...
+]
+```
+
+Happy Scraping!
+
+### Another Example
 
 Suppose you want to scrape badminton club locations from `badmintonclubs.org`. The following configuration will extract the name and href of each club listed on the site:
 
 ```html
 <request url="https://badmintonclubs.org">
-  <list xpath="//map/area" name="locations" key="href">
-    <item
-      name="name"
-      xpath="@title"
-      parse="value.split('badminton in ')[1] if value else None"
-    ></item>
+  <list
+    xpath="//div[@class='states']/ul/li/a"
+    id="locations"
+    name="locations"
+    global
+  >
     <item name="href" xpath="@href"></item>
+    <item name="name" xpath="text()"></item>
   </list>
 </request>
+
 ```
 
 You make a request by a `RequestTag` . Then, you create a `ListTag` inside this request tag for parsing the output of this request. Then, for each location element extract by `xpath` in the `ListTag` , you extract two fields (name and value) by nesting two `ItemTag` inside the `ListTag` .
 
-- `key` attribute in the list tag tells the parser to remove duplicates of the extracted object list by the provided key. In the above case, locations that has the same href are dropped.
+The `key` attribute in the list tag tells the parser to remove duplicates of the extracted object list by the provided key. In the above case, locations that has the same href are dropped.
 
 This HTML snippet is equivalent to the followinig Python code:
 
@@ -133,6 +243,8 @@ output.append({
   "locations": result
 })
 ```
+
+## HTML Configuration
 
 ### `ListTag` and `ItemTag`
 <!-- 
@@ -215,9 +327,11 @@ Attributes:
 <!-- 
 ### `ExportTag`
 
+You can add an `ExportTag` inside a `RequestTag` to export the output of a 
+
 Attributes
 
-- `path` -->
+- `path`  -->
 
 <!-- ### Handling Pagination
 
